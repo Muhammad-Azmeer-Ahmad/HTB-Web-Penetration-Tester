@@ -2,7 +2,7 @@
 
 ## ✅ Completion Certificate
 
-![Module 01 Complete](Screenshots/module-01-complete.png)
+![Module 01 Complete](Screenshots/module-01-complete.jpg)
 
 
 # Module 01 — Web Requests
