@@ -2,10 +2,7 @@
 
 ## ✅ Completion Certificate
 
-![Module 01 Complete](Screenshots/module-01-complete.jpg)
-
-
-# Module 01 — Web Requests
+![Module 01 Complete](Screenshots/module-01-complete.png)
 
 ## What This Module Is About
 HTTP is the protocol that powers all web communication. A client
