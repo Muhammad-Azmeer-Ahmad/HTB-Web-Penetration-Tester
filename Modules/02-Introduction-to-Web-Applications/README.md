@@ -1,29 +1,33 @@
 # Module 02 — Introduction to Web Applications
 
+![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
 
 ## What This Module Is About
 Understanding how web applications are built, how they differ from
 static websites, and why they are such a massive attack surface.
 Before you attack something you need to understand what it is.
 
-## Sections
+## Sections Progress
 - [x] Introduction
-- [ ] More sections coming as I progress...
+- [x] Web Application Layout
+- [x] Front End vs Back End
+- [x] HTML
+- [ ] CSS
+- [ ] JavaScript
+- [ ] More coming...
+
+---
 
 ## Web App vs Static Website
 - Static = same for everyone, manually updated, Web 1.0
 - Web App = dynamic, changes per user, fully functional, Web 2.0
 
-## Why Web Apps Are a Massive Attack Surface
-- Accessible by anyone with a browser worldwide
-- Constantly changing — a single code change can introduce a critical vuln
-- Linked to databases with sensitive data
-- Automated tools make scanning and attacking easier than ever
+---
 
 ## Real World Attack Examples
 
 | Vulnerability | Real World Impact |
-|---------------|-------------------|
+|---------------|------------------|
 | SQL Injection | Extract AD usernames → password spray VPN/email portal |
 | File Inclusion | Read source code → find hidden pages → RCE |
 | File Upload | Upload malicious file as profile picture → full server control |
@@ -34,110 +38,53 @@ Before you attack something you need to understand what it is.
 
 ## Web Application Layout
 
-Three main categories every web app is built around:
-
 | Category | Description |
 |----------|-------------|
 | Infrastructure | Database, servers, hosting setup |
 | Components | UI/UX, Client, Server parts |
 | Architecture | Relationships between all components |
 
----
+### Infrastructure Models
 
-## Infrastructure Models
+| Model | Security Level | Notes |
+|-------|---------------|-------|
+| One Server | ❌ Worst | Everything in one place — one breach = total loss |
+| Client-Server | ✅ Standard | Front end in browser, back end on server |
+| Many Servers — One DB | ✅ Better | Server breach doesn't take down DB |
+| Many Servers — Many DBs | ✅ Best | Full segmentation, redundancy, proper access control |
 
-### Client-Server
-Most common. Server hosts the app, browser is the client.
-Front end runs in browser, back end runs on server.
-
-### One Server
-Everything on one machine — app, database, all of it.
-Riskiest model. One breach = everything compromised.
-Classic "all eggs in one basket."
-
-### Many Servers — One Database
-Multiple web servers, single shared database.
-If one server is compromised, others still run.
-Better segmentation than one server model.
-
-### Many Servers — Many Databases
-Each app gets its own database, sometimes its own DB server.
-Best security — proper segmentation and access control.
-Used for redundancy too — backup runs if primary goes down.
-
----
-
-## Three Tier Architecture
+### Three Tier Architecture
 
 | Layer | What It Does |
 |-------|-------------|
-| Presentation | What user sees — HTML, CSS, JS in browser |
+| Presentation | HTML, CSS, JS — what user sees in browser |
 | Application | Processes requests, checks auth and privileges |
-| Data | Stores and retrieves data for the application |
+| Data | Stores and retrieves data |
 
----
-
-## Microservices and Serverless
-
-**Microservices** — app broken into independent components,
-each doing one job (payments, search, ratings etc).
-Stateless communication between them.
-Can be written in different languages and still talk to each other.
-
-**Serverless** — runs in cloud containers like Docker on AWS/GCP/Azure.
-No server management needed — cloud handles it all.
-
----
-
-## Security Perspective
-- One server model = single point of failure and single point of compromise
-- Architecture flaws are just as dangerous as code flaws
-- Missing RBAC = users accessing admin features without a single line
-  of vulnerable code — it is a design error not a coding error
-- If you breach a server and can not find the database — it is
-  probably on a separate server. Keep enumerating.
-
-<<<<<<< HEAD
 ---
 
 ## Front End vs Back End
 
 ### Front End
-Runs in the browser — everything the user sees and interacts with.
-Built with three technologies:
+Runs in the browser. Everything the user sees and interacts with.
 - **HTML** — structure and content
 - **CSS** — design and styling
 - **JavaScript** — functionality and interaction
 
 ### Back End
-Runs on the server — everything the user never sees.
+Runs on the server. Everything the user never sees.
 
 | Component | Examples |
 |-----------|---------|
-| Back End Servers | Linux, Windows, Docker containers |
+| Servers | Linux, Windows, Docker |
 | Web Servers | Apache, NGINX, IIS |
 | Databases | MySQL, PostgreSQL, MongoDB |
 | Frameworks | Laravel, Django, Spring, ASP.NET |
 
 ### Security Angle
-- **Front end** = Whitebox — we can read the source code directly
-- **Back end** = Blackbox — source is hidden on the server by default
-- LFI vulnerabilities can leak back end source code — turning
-  blackbox into whitebox mid-engagement
-
----
-
-## Top Developer Mistakes (Pentester's Checklist)
-
-| # | Mistake |
-|---|---------|
-| 1 | Permitting invalid data into the database |
-| 5 | Storing plain text passwords |
-| 7 | Storing unencrypted data in database |
-| 8 | Depending excessively on client side validation |
-| 10 | Permitting variables via URL path |
-| 13 | Unverified SQL injections |
-| 14 | Remote file inclusions |
+- Front end = **Whitebox** — source code readable in browser
+- Back end = **Blackbox** — hidden on server by default
+- LFI can leak back end source → turns blackbox into whitebox
 
 ---
 
@@ -158,16 +105,30 @@ Runs on the server — everything the user never sees.
 
 ---
 
-## HTML Basics
+## Top Developer Mistakes — Pentester's Checklist
 
-HTML is the skeleton of every web page. Browser reads it and
-renders it visually. Structure is a tree called the DOM.
+| # | Mistake | Why It Matters |
+|---|---------|---------------|
+| 1 | Invalid data into database | SQLi entry point |
+| 5 | Plain text password storage | Full cred dump on DB breach |
+| 7 | Unencrypted data in DB | Data exposed on breach |
+| 8 | Client side validation only | Bypass with Burp, direct requests |
+| 10 | Variables via URL path | Parameter tampering, IDOR |
+| 13 | Unverified SQL injections | Auth bypass, data exfil |
+| 14 | Remote file inclusions | RCE via crafted file path |
+
+---
+
+## HTML
+
+Skeleton of every web page. Browser reads and renders it visually.
+Structure is a tree called the DOM.
 
 ```html
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Page Title</title>
+        <title>Page Title</title>  <!-- not visible -->
     </head>
     <body>
         <h1>A Heading</h1>
@@ -176,15 +137,14 @@ renders it visually. Structure is a tree called the DOM.
 </html>
 ```
 
-Key elements:
-- `<head>` — not visible, holds title, CSS, JS links
+- `<head>` — invisible, holds title, CSS, JS references
 - `<body>` — everything the user sees
-- `<style>` — CSS goes here
-- `<script>` — JavaScript goes here
+- `<style>` — CSS lives here
+- `<script>` — JavaScript lives here
 
 ### URL Encoding
 Browsers only support ASCII in URLs. Everything else gets
-percent-encoded — special characters replaced with `%XX`.
+percent-encoded — replaced with `%XX`.
 
 | Character | Encoded |
 |-----------|---------|
@@ -193,17 +153,28 @@ percent-encoded — special characters replaced with `%XX`.
 | `"` | %22 |
 | `#` | %23 |
 
-Why this matters for pentesting — SQL injection payloads and
-XSS often need URL encoding to pass through filters or get
-correctly interpreted by the server.
+Pentesting relevance — SQLi and XSS payloads often need URL
+encoding to bypass filters or get correctly parsed by the server.
 
 ### DOM — Document Object Model
-Every HTML element is a DOM node. JavaScript can access and
-manipulate any element via the DOM.
-Useful for XSS — we can inject JS that reads, modifies, or
-creates DOM elements to steal data or hijack sessions.
+Every HTML element is a node in the DOM tree. JavaScript can
+read, modify, or create any element via the DOM.
 
-=======
->>>>>>> 7be55426794e3a3164b786ebabb29ceeaab9a089
-## Status
-🔄 In progress — updating as I complete each section
+XSS relevance — injected JS manipulates the DOM to steal
+cookies, redirect users, or modify page content silently.
+
+---
+
+## Security Perspective
+- One server = single point of failure and compromise
+- Architecture flaws are as dangerous as code flaws
+- Missing RBAC = admin access without any vulnerable code
+- If you breach a server and can not find the DB — it is
+  on a separate server, keep enumerating
+- Client side validation = security theater, always bypass
+  and test directly against the server
+
+---
+
+## 🔄 Status
+In progress — sections added as completed
