@@ -1,6 +1,8 @@
 # Module 02 — Introduction to Web Applications
 
-![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
+![Status](https://img.shields.io/badge/Status-Complete-brightgreen)
+![Platform](https://img.shields.io/badge/Platform-HackTheBox-red)
+![Category](https://img.shields.io/badge/Category-General-blue)
 
 ## What This Module Is About
 Understanding how web applications are built, how they differ from
@@ -12,15 +14,38 @@ Before you attack something you need to understand what it is.
 - [x] Web Application Layout
 - [x] Front End vs Back End
 - [x] HTML
-- [ ] CSS
-- [ ] JavaScript
-- [ ] More coming...
+- [x] CSS
+- [x] JavaScript
+- [ ] Sensitive Data Exposure
+- [ ] HTML Injection
+- [ ] Cross-Site Scripting XSS
+- [ ] Cross-Site Request Forgery CSRF
+- [ ] Back End Servers
+- [ ] Web Servers
+- [ ] Databases
+- [ ] Development Frameworks and APIs
+- [ ] Common Web Vulnerabilities
+- [ ] Public Vulnerabilities
 
 ---
 
 ## Web App vs Static Website
-- Static = same for everyone, manually updated, Web 1.0
-- Web App = dynamic, changes per user, fully functional, Web 2.0
+
+| | Static Website | Web Application |
+|-|---------------|-----------------|
+| Content | Same for everyone | Dynamic per user |
+| Updates | Manual by developer | Real-time |
+| Generation | Web 1.0 | Web 2.0 |
+| Functionality | None | Full |
+
+---
+
+## Why Web Apps Are a Massive Attack Surface
+- Accessible by anyone with a browser worldwide
+- Constantly changing — a single code change can introduce a critical vuln
+- Linked to databases containing sensitive user and corporate data
+- Automated tools make scanning and attacking easier than ever
+- Dynamic nature means they are constantly overlooked during security reviews
 
 ---
 
@@ -33,6 +58,7 @@ Before you attack something you need to understand what it is.
 | File Upload | Upload malicious file as profile picture → full server control |
 | IDOR | Change `/user/701/edit` to `/user/702/edit` → access another user |
 | Broken Access Control | Register with `roleid=0` in POST body → instant admin account |
+| Command Injection | Unsafe OS calls → execute commands on the server |
 
 ---
 
@@ -48,7 +74,7 @@ Before you attack something you need to understand what it is.
 
 | Model | Security Level | Notes |
 |-------|---------------|-------|
-| One Server | ❌ Worst | Everything in one place — one breach = total loss |
+| One Server | ❌ Worst | Everything together — one breach = total loss |
 | Client-Server | ✅ Standard | Front end in browser, back end on server |
 | Many Servers — One DB | ✅ Better | Server breach doesn't take down DB |
 | Many Servers — Many DBs | ✅ Best | Full segmentation, redundancy, proper access control |
@@ -59,7 +85,16 @@ Before you attack something you need to understand what it is.
 |-------|-------------|
 | Presentation | HTML, CSS, JS — what user sees in browser |
 | Application | Processes requests, checks auth and privileges |
-| Data | Stores and retrieves data |
+| Data | Stores and retrieves data for the application |
+
+### Microservices
+App broken into independent components each doing one job —
+payments, search, ratings etc. Stateless communication between
+them. Can be written in different languages and still interact.
+
+### Serverless
+Runs in cloud containers like Docker on AWS, GCP, Azure.
+No server management needed — cloud provider handles everything.
 
 ---
 
@@ -67,9 +102,12 @@ Before you attack something you need to understand what it is.
 
 ### Front End
 Runs in the browser. Everything the user sees and interacts with.
-- **HTML** — structure and content
-- **CSS** — design and styling
-- **JavaScript** — functionality and interaction
+
+| Technology | Role |
+|-----------|------|
+| HTML | Structure and content |
+| CSS | Design and styling |
+| JavaScript | Functionality and interaction |
 
 ### Back End
 Runs on the server. Everything the user never sees.
@@ -82,9 +120,10 @@ Runs on the server. Everything the user never sees.
 | Frameworks | Laravel, Django, Spring, ASP.NET |
 
 ### Security Angle
-- Front end = **Whitebox** — source code readable in browser
+- Front end = **Whitebox** — source code readable directly in browser
 - Back end = **Blackbox** — hidden on server by default
-- LFI can leak back end source → turns blackbox into whitebox
+- LFI vulnerabilities can leak back end source → turns blackbox
+  into whitebox mid-engagement
 
 ---
 
@@ -112,7 +151,7 @@ Runs on the server. Everything the user never sees.
 | 1 | Invalid data into database | SQLi entry point |
 | 5 | Plain text password storage | Full cred dump on DB breach |
 | 7 | Unencrypted data in DB | Data exposed on breach |
-| 8 | Client side validation only | Bypass with Burp, direct requests |
+| 8 | Client side validation only | Bypass with Burp, test directly |
 | 10 | Variables via URL path | Parameter tampering, IDOR |
 | 13 | Unverified SQL injections | Auth bypass, data exfil |
 | 14 | Remote file inclusions | RCE via crafted file path |
@@ -128,7 +167,7 @@ Structure is a tree called the DOM.
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Page Title</title>  <!-- not visible -->
+        <title>Page Title</title>  <!-- not visible to user -->
     </head>
     <body>
         <h1>A Heading</h1>
@@ -137,10 +176,12 @@ Structure is a tree called the DOM.
 </html>
 ```
 
-- `<head>` — invisible, holds title, CSS, JS references
-- `<body>` — everything the user sees
-- `<style>` — CSS lives here
-- `<script>` — JavaScript lives here
+| Element | Purpose |
+|---------|---------|
+| `<head>` | Invisible — holds title, CSS, JS references |
+| `<body>` | Everything the user sees |
+| `<style>` | CSS lives here |
+| `<script>` | JavaScript lives here |
 
 ### URL Encoding
 Browsers only support ASCII in URLs. Everything else gets
@@ -152,6 +193,7 @@ percent-encoded — replaced with `%XX`.
 | `'` | %27 |
 | `"` | %22 |
 | `#` | %23 |
+| `&` | %26 |
 
 Pentesting relevance — SQLi and XSS payloads often need URL
 encoding to bypass filters or get correctly parsed by the server.
@@ -165,16 +207,19 @@ cookies, redirect users, or modify page content silently.
 
 ---
 
-## Security Perspective
-- One server = single point of failure and compromise
-- Architecture flaws are as dangerous as code flaws
-- Missing RBAC = admin access without any vulnerable code
-- If you breach a server and can not find the DB — it is
-  on a separate server, keep enumerating
-- Client side validation = security theater, always bypass
-  and test directly against the server
+## CSS — Cascading Style Sheets
 
----
+Defines how HTML elements look — colors, fonts, sizes, layout.
 
-## 🔄 Status
-In progress — sections added as completed
+```css
+body {
+  background-color: black;
+}
+
+h1 {
+  color: white;
+  text-align: center;
+}
+
+p {
+  font-family: helvetica;
